@@ -11,24 +11,6 @@ from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 
 
-"""
-Krav för att skriptet ska funka:
-1. Första artikeln måste börja på rad A10
-2. Kvitto ligger i h columnen
-3. Det är 70 glas i en keg 
-4. Coors måste byta namn från Coors Light i kassaservern
-5. Bright light måste ta bort "The" i kassaservern
-"""
-
-"""
- # if(len(article) == 2):
-        #     try: 
-        #         float(article[1].split(" ")[0].replace("\xa0", "").replace(",", "."))
-        #     except ValueError:
-        #         continue
-"""
-
-
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive.readonly"]
 
 """
@@ -124,7 +106,6 @@ def add_quantities_to_sheet(sold_articles_dict, sheets, sheet_names, sheet_id, c
 
         for i in range(0, filtered_articles_length):
             if not isinstance(filtered_articles[i], str):
-         # Skip iteration if the type is not a string
                 continue
             current_item = filtered_articles[i].lower()
 
@@ -201,8 +182,6 @@ def getRequirementsMsg():
             1. Första artikeln måste börja på rad A10
             2. Kvitto ligger i h columnen
             3. Det är 70 glas i en keg
-            4. Coors måste byta namn från Coors Light i kassaservern
-            5. Bright light måste ta bort "The" i kassaservern
         """
     return msg
 
@@ -277,3 +256,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+"""
+Good code to have if you want to get the price for everything in price column as well
+ # if(len(article) == 2):
+        #     try: 
+        #         float(article[1].split(" ")[0].replace("\xa0", "").replace(",", "."))
+        #     except ValueError:
+        #         continue
+"""
