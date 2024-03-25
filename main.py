@@ -199,7 +199,6 @@ def gui(credentials):
 
     while True:
         event, values = window.read()
-        print(values)
         if event == psg.WIN_CLOSED:
             break
         if event == "-RUN-":
@@ -242,7 +241,6 @@ def run_script(credentials, pdf_url, sheet_url, column):
     downloadPDF(credentials, pdf_id)
     sold_articles_dict = extract_text("dowloaded_files/artikel_rapport.pdf")
     add_quantities_to_sheet(sold_articles_dict, sheets, sheet_names, sheet_id, column)
-    print("Done")
 
 
 def main():
@@ -252,7 +250,6 @@ def main():
         
     except HttpError as error:
         print(error)
-
 
 if __name__ == "__main__":
     main()
