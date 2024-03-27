@@ -95,13 +95,14 @@ def filter_data(articles):
 Add each article and it's quantity from the pdf to spreadsheet we define.
 """
 def add_quantities_to_sheet(sold_articles_dict, sheets, sheet_names, sheet_id, column):
+    print(column, type(column), column.upper())
     try:
         result = sheets.values().get(spreadsheetId=sheet_id, range=f"{sheet_names[0]}!A10:A").execute()
         articles = result.get("values")
         filtered_articles : list = filter_data(articles)
 
         sold_articles_keys= list(sold_articles_dict.keys())
-        offset = 10 
+        row_offset = 10 
         filtered_articles_length = len(filtered_articles)
 
         for i in range(0, filtered_articles_length):
@@ -113,9 +114,9 @@ def add_quantities_to_sheet(sold_articles_dict, sheets, sheet_names, sheet_id, c
 
                 if("fat" in current_item):
                     quiantity = ceil(sold_articles_dict[current_item]["quantity"]/70)  
-                    sheets.values().update(spreadsheetId=sheet_id, range=f"{sheet_names[0]}!{'F' if column else 'H'}{i+offset}", valueInputOption="USER_ENTERED", body={"values":[[f"{quiantity}"]]}).execute()
+                    sheets.values().update(spreadsheetId=sheet_id, range=f"{sheet_names[0]}!{column.upper()}{i+row_offset}", valueInputOption="USER_ENTERED", body={"values":[[f"{quiantity}"]]}).execute()
                 else:   
-                    sheets.values().update(spreadsheetId=sheet_id, range=f"{sheet_names[0]}!{'F' if column else 'H'}{i+offset}", valueInputOption="USER_ENTERED", body={"values":[[f"{sold_articles_dict[current_item]['quantity']}"]]}).execute()
+                    sheets.values().update(spreadsheetId=sheet_id, range=f"{sheet_names[0]}!{column.upper()}{i+row_offset}", valueInputOption="USER_ENTERED", body={"values":[[f"{sold_articles_dict[current_item]['quantity']}"]]}).execute()
 
     except HttpError as error:
         print(error)
@@ -158,29 +159,27 @@ def createLayout():
             psg.In(size=(95,1), enable_events=True, key="-Sheet-", font=("", 12))
         ],
         [
+            psg.Text("Kvitto kolumn:",size=(25,1),background_color="black", font=("",16)),
+            psg.In(size=(95,1), enable_events=True, key="-Receipt-", font=("", 12))
+        ],
+        [
             psg.Text("", size=(1, 1), background_color="black")
         ],
         [
-            psg.Button("Kör", font=("", 16), size=(15,1),button_color=("white","black"),key="-RUN-",),
-            psg.Checkbox(
-                "Krökens/Brandons beställningslista", 
-                "Tangebels",
-                enable_events=True,
-                key="KBB", 
-                background_color="black", 
-                font=("", 16))
+            psg.Button("Kör", font=("", 16), size=(15,1),button_color=("white","black"),key="-RUN-",)
         ]
     ]
     return column
 
 def getHelpMsg():
-    msg = "Fyll i länken för respektive dokument, länken får du genom att högerklicka på filen i drive, tryck dela och sedan kopiera länk. När båda fält är ifyllda välj om mallen för beställningslistan är Kröken/Brandon eller inte. Kör sedan programmet och boom allt är klart!!!"
+    msg = "Fyll i länken för respektive dokument, länken får du genom att högerklicka på filen i drive, tryck dela och sedan kopiera länk. Slutligen fyll i kvittokolumnen och kör sedan programmet och boom allt är klart!!!"
     return msg
 
 def getRequirementsMsg():
     msg = """Krav för att skriptet ska funka:
-            1. Första artikeln måste börja på rad A10
-            2. Kvitto ligger i h columnen
+
+            1. Artikeln måste ha samma namn i kassaservern som i beställningslistan
+            2. Första artikeln måste börja på rad A10
             3. Det är 70 glas i en keg
         """
     return msg
@@ -207,7 +206,8 @@ def gui(credentials):
                 create_popup("You must input values in both fields")
             else:
                 try:
-                    run_script(credentials, values["-PDF-"], values["-Sheet-"], values["KBB"])
+                    run_script(credentials, values["-PDF-"], values["-Sheet-"], values["-Receipt-"])
+                    create_popup("Klart!!:)")
                 except ValueError as error:
                     create_popup(error)
         if(event == "-Help-"):
